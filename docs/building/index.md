@@ -6,8 +6,8 @@ sidebar_position: 2
 
 :::tip
 
-This guide covers building Dalamud from source, and is intended for people who
-are making changes to Dalamud itself.
+This guide covers building Dalamud from source **on Windows**, and is intended
+for people who are making changes to Dalamud itself.
 
 **If you're just looking to create plugins, you don't need to follow this
 guide!** You can skip this section and head over to the
@@ -22,6 +22,8 @@ environment and building Dalamud.
 ## Prerequisites
 
 - Windows 10/Windows Server 2016 or higher
+  - **If you absolutely need to build Dalamud outside Windows,** check the
+    [Building Dalamud with MinGW](/building/mingw) sub-page.
 - [Visual Studio 2026](https://visualstudio.microsoft.com/vs/)
   - Both the "Desktop Development with C++" and "Desktop Development with .NET"
     workloads are required.
@@ -79,12 +81,8 @@ try building using Nuke to rule out build system issues.
 
 :::info
 
-Building on other operating systems is not supported at this time, due to native
-components (such as the injector) that rely on Windows APIs.
-
-However, you may succeed with a _partial_ build on Linux/macOS by using
-`./build.sh` instead of `.\build.ps1`, or by building the `Dalamud` project
-directly with `dotnet build`.
+Building on other operating systems without native components can be done by
+building the `Dalamud` project directly with `dotnet build`.
 
 :::
 
