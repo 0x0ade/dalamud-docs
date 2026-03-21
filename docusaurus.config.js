@@ -6,13 +6,13 @@ const darkCodeTheme = themes.dracula;
 
 /** @type {import('@docusaurus/types').Config} */
 export default {
-  title: 'Dalamud',
+  title: 'NOT Dalamud',
   tagline:
-    'Documentation for the Dalamud plugin framework for FINAL FANTASY XIV.',
+    'NOT Documentation for the Dalamud plugin framework for FINAL FANTASY XIV.',
   favicon: 'img/favicon.ico',
 
-  url: 'https://dalamud.dev',
-  baseUrl: '/',
+  url: 'https://0x0ade.github.io/',
+  baseUrl: '/dalamud-docs/',
 
   // Info for GitHub Pages deployment
   organizationName: 'goatcorp',
