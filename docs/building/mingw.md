@@ -89,6 +89,13 @@ environments, e.g. if you prefer using Ghidra as a gdb frontend.
 
 - [Samsung netcoredbg win64](https://github.com/Samsung/netcoredbg) in
   `Dalamud/linuxtools/netcoredbg/`
+  - This is used for launching the C# injector with a debugger, as vsdbg
+    struggles with launching.
+- VSCode CoreCLR Windows x86-64 vsdbg in `Dalamud/linuxtools/vsdbg/`
+  - This can be sourced from an existing VSCode Windows install, or using the
+    [official download script](https://aka.ms/getvsdbgps1) (`win7-x64`).
+  - This is used for attaching to the running game process to debug plugins, as
+    netcoredbg struggles with attaching.
 - [XIVLauncher.Core with PR 337](https://github.com/goatcorp/XIVLauncher.Core/pull/337)
   merged and **in PATH as `xlcore`** via a symlink, wrapper script, or similar.
 - gdb, ideally compiled with support for `set osabi Windows`
@@ -102,14 +109,17 @@ environments, e.g. if you prefer using Ghidra as a gdb frontend.
 ### Launch Configurations
 
 - **Launch Wine netcoredbg Dalamud.Injector with winedbg:**<br> Launches
-  `Dalamud.Injector.exe` with netcoredbg with arguments set to launch FFXIV with
-  `winedbg` in `gdbserver` mode. Can be used to debug the injector and to
+  `Dalamud.Injector.exe` with `netcoredbg` with arguments set to launch FFXIV
+  with `winedbg` in `gdbserver` mode. Can be used to debug the injector and to
   quickly launch the game itself for basic debugging.
 
 - **Attach to FFXIV via gdb on localhost:12345:**<br> Can be used in combination
-  with the previous launch configuration. If you want to attach to a running
-  full instance instead, use `xlcore wine taskmgr` and `xlcore wine winedbg` to
-  attach to the Wine process ID for the game.
+  with the previous launch configuration, or after launching the game via
+  xlcore.
+
+- **Attach to FFXIV via coreclr vsdbg:**<br> Attaches C# `vsdbg` to an already
+  running game process launched via xlcore, useful for debugging Dalamud itself
+  or any self-built plugins.
 
 - **Launch build/build.csproj:**<br> Launches the NUKE build project. Can be
   used to debug the CMake generator.
