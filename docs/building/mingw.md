@@ -105,6 +105,9 @@ environments, e.g. if you prefer using Ghidra as a gdb frontend.
   - For generating this, see
     [this patched version of ghidra-ExportDwarfELFSymbols](https://github.com/0x0ade/ghidra-ExportDwarfELFSymbols)
     for one possible method.
+- Optionally: A bash script at `linuxtools/ffxivrc.sh` to override and export
+  any env vars you want, such as `DOTNET_ROOT` or
+  `DOTNET_SYSTEM_GLOBALIZATION_USENLS`
 
 ### Launch Configurations
 
