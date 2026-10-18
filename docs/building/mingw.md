@@ -9,26 +9,12 @@ sidebar_position: 1
 This guide acts as supplementary information to the main
 [Building Dalamud](/building/) page, and thus refers to steps from that page.
 
-Dalamud's native components are maintained via Visual Studio. Those components
-don't change often, which means it's much easier to skip the native build steps,
-follow the dotnet (C#) build-steps only, and re-use the existing built binaries
-with no drawbacks.
+Dalamud's native components are maintained with the Windows SDK and MSVC in
+mind.
 
 **As such, this _will_ break from time to time.** Fixes are welcome though!
 
 :::
-
-Dalamud is built using [Nuke](https://nuke.build), which lacks built-in
-first-class support for Linux-supporting build systems. Specifically, as Nuke
-only manages kickoff using other tools such as MSBuild and dotnet build, it
-relies on that tooling to declare those projects with all their source files and
-props.
-
-In the case of Dalamud, the C / C++ projects use
-[MSBuild `.vcxproj` files](https://learn.microsoft.com/en-us/cpp/build/walkthrough-using-msbuild-to-create-a-visual-cpp-project?view=msvc-170).
-Those are very Visual Studio centric: It's trivial to do basic edits to them in
-any text editor, but it's non-trival to find what VS toggle maps to the XML
-syntax without using Visual Studio yourself.
 
 ## Building
 
@@ -38,11 +24,10 @@ syntax without using Visual Studio yourself.
 - An x64 Linux environment, e.g. a 64-bit Linux OS on x64 hardware
   - This is not a hard requirement, but this page is written with this setup in
     mind.
-- CMake
 - MinGW x64 `x86_64-w64-mingw32`, either GCC or LLVM
   - If you prefer LLVM, unpack / symlink
     [llvm-mingw](https://github.com/mstorsjo/llvm-mingw) to
-    `Dalamud/linuxtools/llvm/` and it'll be used.
+    `Dalamud/tools/linux/llvm/` and it'll be used.
   - The CMake toolchain falls back to `x86_64-w64-mingw32-gcc` in PATH if
     nothing else is found.
 
@@ -54,22 +39,11 @@ the following:
 
 ### Build Steps
 
-Follow the main build steps, but instead of running the PowerShell script, run:
+Follow the main build steps, but instead of `build.cmd`, run:
 
 ```bash
 ./build.sh
 ```
-
-<sub>(Yes, even if you have PowerShell installed on Linux.)</sub>
-
-:::tip
-
-The Dalamud repository contains some basic VSCode configuration for debugging
-various parts of the build process.
-
-Follow the debugging steps below for more information.
-
-:::
 
 ## Running
 
@@ -88,10 +62,10 @@ environments, e.g. if you prefer using Ghidra as a gdb frontend.
 ### Debug Prerequisites
 
 - [Samsung netcoredbg win64](https://github.com/Samsung/netcoredbg) in
-  `Dalamud/linuxtools/netcoredbg/`
+  `Dalamud/tools/linux/netcoredbg/`
   - This is used for launching the C# injector with a debugger, as vsdbg
     struggles with launching.
-- VSCode CoreCLR Windows x86-64 vsdbg in `Dalamud/linuxtools/vsdbg/`
+- VSCode CoreCLR Windows x86-64 vsdbg in `Dalamud/tools/linux/vsdbg/`
   - This can be sourced from an existing VSCode Windows install, or using the
     [official download script](https://aka.ms/getvsdbgps1) (`win7-x64`).
   - This is used for attaching to the running game process to debug plugins, as
@@ -99,15 +73,15 @@ environments, e.g. if you prefer using Ghidra as a gdb frontend.
 - [XIVLauncher.Core with PR 337](https://github.com/goatcorp/XIVLauncher.Core/pull/337)
   merged and **in PATH as `xlcore`** via a symlink, wrapper script, or similar.
 - gdb, ideally compiled with support for `set osabi Windows`
-- A symlink to the main .exe in `Dalamud/linuxtools/ffxiv_dx11.exe`
+- A symlink to the main .exe in `Dalamud/tools/linux/ffxiv_dx11.exe`
 - DWARF debug symbols for the main .exe in
-  `Dalamud/linuxtools/ffxiv_dx11.exe.dwarf`
+  `Dalamud/tools/linux/ffxiv_dx11.exe.dwarf`
   - For generating this, see
     [this patched version of ghidra-ExportDwarfELFSymbols](https://github.com/0x0ade/ghidra-ExportDwarfELFSymbols)
     for one possible method.
-- Optionally: A bash script at `linuxtools/ffxivrc.sh` to override and export
-  any env vars you want, such as `DOTNET_ROOT` or
-  `DOTNET_SYSTEM_GLOBALIZATION_USENLS`
+- Optionally: A bash script at `tools/linux/ffxivrc.sh` to override and export
+  any env vars and tools you want, such as setting an alias for `xlcore`,
+  overriding `DOTNET_ROOT` or `DOTNET_SYSTEM_GLOBALIZATION_USENLS`
 
 ### Launch Configurations
 
@@ -124,12 +98,7 @@ environments, e.g. if you prefer using Ghidra as a gdb frontend.
   running game process launched via xlcore, useful for debugging Dalamud itself
   or any self-built plugins.
 
-- **Launch build/build.csproj:**<br> Launches the NUKE build project. Can be
-  used to debug the CMake generator.
-
-- **CMake configure DalamudCrashHandler:**<br> Configures
-  `Dalamud/build/cmakeprojs/DalamudCrashHandler` with a debugger attached. To be
-  used after CMake project generation.
+- **CMake configure:**<br> Configures `Dalamud/build` with a debugger attached.
 
 - **Launch winedbg Debug DalamudCrashHandler and attach gdb:**<br> Launches and
   attaches a debugger to `DalamudCrashHandler` with no arguments. Useful to
@@ -138,25 +107,7 @@ environments, e.g. if you prefer using Ghidra as a gdb frontend.
 If you prefer using tooling other than VSCode, check the arguments and steps for
 those launch targets in the launch.json configuration file.
 
-## ... but how?
-
-### Why not move to \<insert build system here>?
-
-Originally, building Dalamud with all its components required a full Windows +
-Visual Studio setup, as the native components were heavily reliant on MSVC
-compilation behavior. Even now, nearly all Dalamud development is happening on
-Windows + Visual Studio. As such, a crazy member of the community though:
-
-> I bet I can build this without moving away from .vcxproj and NUKE!
-
-NUKE build recipes have full access to the
-[MSBuild parser](https://github.com/dotnet/msbuild), which is written in C#,
-open-sourced, MIT-licensed, available on NuGet, and used by NUKE itself. As
-such, nothing stops us from parsing said .vcxproj files (or at least the subset
-we need), generating CMakeLists out of those, and invoking the necessary CMake
-commands to configure and build the project via NUKE.
-
-### Quirks
+## Quirks
 
 MinGW does not support `#pragma comment` and `__try / __except` among other
 things. Furthermore, header and library names are lowercase, and some parts of
@@ -169,13 +120,3 @@ mismatches, while others require a bit more insight on how e.g.
 handling by default.
 
 Even if you don't have a Linux build environment, CI will flag most issues.
-
-### Extensions
-
-When the .vcxproj files get parsed, the property `IsMinGW` is set to `GNU` or
-`Clang` to match
-[CLANG_CXX_COMPILER_ID](https://cmake.org/cmake/help/latest/variable/CMAKE_LANG_COMPILER_ID.html).
-
-`VCProjToCMakeLists` does not implement MSBuild targets. Any post-build steps
-should be defined using the `CMakePostBuild` property with standard CMake
-installation syntax instead.
