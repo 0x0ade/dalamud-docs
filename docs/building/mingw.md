@@ -104,6 +104,13 @@ environments, e.g. if you prefer using Ghidra as a gdb frontend.
   attaches a debugger to `DalamudCrashHandler` with no arguments. Useful to
   verify that winedbg and gdb are functional.
 
+- **Launch Wine netcoredbg Dalamud.Test (Debug):**<br> Launches and attaches a
+  debugger to `Dalamud.Test` built in the debug configuration using the .NET
+  Windows SDK in Wine. This expects `Dalamud.Test` to already be built and a
+  Wine prefix with the .NET SDK for Windows to be prepared. `dotnetsdk-wine` may
+  be overridden in your `ffxivrc.sh` separately if you prefer using a prefix
+  other than the game prefix.
+
 If you prefer using tooling other than VSCode, check the arguments and steps for
 those launch targets in the launch.json configuration file.
 
